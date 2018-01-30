@@ -11,5 +11,5 @@ void loop() {
   sprintf(buf, "%d", cnt1);
   Serial.println(buf);
   cnt1++;
-  delay(1000);
+  delay(500);
 }
