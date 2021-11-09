@@ -1,7 +1,9 @@
 import processing.serial.*;
+import java.util.StringTokenizer;
 
 Serial myPort;  // The serial port
 int keyTyped = 0;
+int portnum=-1;
 
 void setup() {
   size(300,300);
@@ -9,17 +11,45 @@ void setup() {
   println(strOS);
   
   // List all the available serial ports
-  printArray(Serial.list());
+  String[] devices = Serial.list();
+  printArray(devices);
+  
   String portName;
-  int portnum=0;
+  print(String.format("Found %d devices", devices.length));
+  
   if(System.getProperty("os.name").compareTo("Mac OS X") ==0)
-    portnum = 1;
+  {  
+    // Find something like "/dev/cu.usbmodem14301" or "/dev/tty.usbmodem14301" 
+     for (int i = 0; i < devices.length; i++) 
+     {
+       String dev = devices[i];//getLastToken(devices[i], "/");
+       boolean match = dev.matches(".*cu.usbmodem.*");
+       
+       if(match)
+         portnum = i;
+       
+       print(String.format("%d\t%s\t%b\n", i, dev, match));
+     }
     
-  portName = Serial.list()[portnum];
-  println(portName);
-  myPort = new Serial(this, portName, 9600);
-  myPort.clear();
-  println("hello");
+  } 
+  else 
+  {
+    portnum = 0;
+  }
+  
+  if(portnum>-1)
+  {
+    portName = devices[portnum];
+    print(String.format("Connecting to ... %s @port #%d\n", portName, portnum));
+    
+    myPort = new Serial(this, portName, 9600);
+    myPort.clear();
+    println("hello");
+  }
+  else
+  {
+    println("Something went wrong ! Check your device !");
+  }
 }
 
 void draw() {
@@ -32,8 +62,12 @@ void draw() {
     text( buf1,10,50);
   }
 }
+
+
 void keyPressed() {
   keyTyped = key;
+  if(portnum<0) return;
+  
   switch(key)
   {
     case '1': //49
@@ -51,4 +85,12 @@ void keyPressed() {
       
       
   }
+}
+
+
+// https://stackoverflow.com/a/27833076
+private String getLastToken(String strValue, String splitter )  
+{        
+   String[] strArray = strValue.split(splitter);  
+   return strArray[strArray.length -1];            
 }
