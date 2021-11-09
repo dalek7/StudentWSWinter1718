@@ -15,7 +15,7 @@ void setup() {
   printArray(devices);
   
   String portName;
-  print(String.format("Found %d devices", devices.length));
+  print(String.format("Found %d devices\n", devices.length));
   
   if(System.getProperty("os.name").compareTo("Mac OS X") ==0)
   {  
